@@ -3,7 +3,9 @@ const choices = ["rock", "paper", "scissors"];
 const computerPlay = () => choices[Math.floor(Math.random() * 3)];
 
 const playRound = (playerSelection, computerSelection) => {
-  playerSelection = playerSelection.toLowerCase();
+  if (!choices.includes(playerSelection)) {
+    throw new Error(`Invalid choice: ${playerSelection}.`);
+  }
 
   if (playerSelection === computerSelection) {
     return "It's a tie!";
@@ -23,15 +25,29 @@ const game = () => {
   let computerScore = 0;
 
   for (let i = 0; i < 5; i++) {
-    const playerSelection = prompt(`Round ${i+1}: Enter your choice: ${choices.join(", ")}`);
+    let playerSelection = "";
+    while (!choices.includes(playerSelection)) {
+      playerSelection = prompt(`Round ${i+1}: Enter your choice: ${choices.join(", ")}`).toLowerCase();
+      try {
+        playRound(playerSelection, computerPlay());
+      } catch (e) {
+        console.error(e.message);
+      }
+    }
     const computerSelection = computerPlay();
-    const result = playRound(playerSelection, computerSelection);
-    console.log(result);
+    if (playerSelection) {
+      try {
+        const result = playRound(playerSelection, computerSelection);
+        console.log(result);
 
-    if (result.startsWith("You win!")) {
-      playerScore++;
-    } else if (result.startsWith("You lose!")) {
-      computerScore++;
+        if (result.startsWith("You win!")) {
+          playerScore++;
+        } else if (result.startsWith("You lose!")) {
+          computerScore++;
+        }
+      } catch (e) {
+        console.error(e.message);
+      }
     }
   }
 

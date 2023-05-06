@@ -1,9 +1,40 @@
-const choices = ["rock", "paper", "scissors"];
+const computerPlay = () => {
+  const choices = ["rock", "paper", "scissors"];
+  return choices[Math.floor(Math.random() * choices.length)];
+};
 
-const computerPlay = () => choices[Math.floor(Math.random() * choices.length)];
+const getPlayerSelection = (choices, round) => {
+  let playerSelection = null;
 
-const playRound = (playerSelection, computerSelection) => {
-  playerSelection = playerSelection.toLowerCase();
+  while (playerSelection === null || !choices.includes(playerSelection)) {
+    playerSelection = prompt(`Round ${round}: Enter your choice (${choices.join(", ")}):`);
+
+    if (playerSelection === null) {
+      if (confirmCancel()) {
+        return null;
+      }
+    } else {
+      playerSelection = playerSelection.trim().toLowerCase();
+      if (!choices.includes(playerSelection)) {
+        alertInvalidChoice(choices, playerSelection);
+      }
+    }
+  }
+
+  return playerSelection;
+};
+
+const confirmCancel = () => {
+  return confirm("Are you sure you want to cancel the game?");
+};
+
+const alertInvalidChoice = (choices, playerSelection) => {
+  alert(`Invalid choice: ${playerSelection}. Please choose from ${choices.join(", ")}.`);
+};
+
+const playRound = (playerSelection, computerSelection, choices) => {
+  playerSelection = playerSelection.trim().toLowerCase();
+
   if (!choices.includes(playerSelection)) {
     return `Invalid choice: ${playerSelection}.`;
   }
@@ -21,40 +52,51 @@ const playRound = (playerSelection, computerSelection) => {
   }
 };
 
-const game = () => {
-  let playerScore = 0;
-  let computerScore = 0;
-  for (let i = 0; i < 5; i++) {
-    let playerSelection = null;
-    while (playerSelection === null || !choices.includes(playerSelection)) {
-      playerSelection = prompt(`Round ${i+1}: Enter your choice: ${choices.join(", ")}`);
-      if (playerSelection === null) {
-        alert("You must play the round. Please enter your choice.");
-      } else {
-        playerSelection = playerSelection.toLowerCase();
-        if (!choices.includes(playerSelection)) {
-          alert(`Invalid choice: ${playerSelection}. Please choose from ${choices.join(", ")}.`);
-        }
-      }
-    }
-    const computerSelection = computerPlay();
-    const result = playRound(playerSelection, computerSelection);
-    console.log(result);
-
-    if (result.startsWith("You win!")) {
-      playerScore++;
-    } else if (result.startsWith("You lose!")) {
-      computerScore++;
-    }
-  }
-
-  if (playerScore > computerScore) {
-    console.log(`You win the game! Final score: ${playerScore}-${computerScore}`);
-  } else if (computerScore > playerScore) {
-    console.log(`You lose the game! Final score: ${playerScore}-${computerScore}`);
-  } else {
-    console.log(`It's a tie! Final score: ${playerScore}-${computerScore}`);
+const updateScore = (result, scores) => {
+  if (result.startsWith("You win!")) {
+    scores.player++;
+  } else if (result.startsWith("You lose!")) {
+    scores.computer++;
   }
 };
 
-game()
+const printFinalScore = (scores) => {
+  if (scores.player > scores.computer) {
+    console.log(`You win the game! Final score: ${scores.player}-${scores.computer}`);
+  } else if (scores.computer > scores.player) {
+    console.log(`You lose the game! Final score: ${scores.player}-${scores.computer}`);
+  } else {
+    console.log(`It's a tie! Final score: ${scores.player}-${scores.computer}`);
+  }
+};
+
+const playGame = (rounds, choices) => {
+  let scores = { player: 0, computer: 0 };
+
+  for (let i = 1; i <= rounds; i++) {
+    let playerSelection = getPlayerSelection(choices, i);
+
+    if (playerSelection === null) {
+      return;
+    }
+
+    const computerSelection = computerPlay();
+    const result = playRound(playerSelection, computerSelection, choices);
+    console.log(result);
+
+    updateScore(result, scores);
+  }
+
+  printFinalScore(scores);
+};
+
+const game = () => {
+  const choices = ["rock", "paper", "scissors"];
+  const rounds = 5;
+
+  alert("Welcome to Rock Paper Scissors!\n\nYou play against the computer for 5 rounds. Choose 'rock', 'paper', or 'scissors' each round to try to win.\n\nGood luck!");
+
+  playGame(rounds, choices);
+};
+
+game();

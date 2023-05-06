@@ -40,7 +40,7 @@ const game = () => {
         const result = playRound(playerSelection, computerSelection);
         console.log(result);
 
-    if (result.startsWith("You win!")) {
+      if (result.startsWith("You win!")) {
           playerScore++;
         } else if (result.startsWith("You lose!")) {
           computerScore++;
